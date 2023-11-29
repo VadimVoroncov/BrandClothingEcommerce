@@ -6,10 +6,14 @@ namespace BrandClothingEcommerce.Repositories
 {
     public class CartRepository : ICartRepository
     {
+        // Контекст базы данных
         private readonly ApplicationDbContext _db;
-        private readonly UserManager<IdentityUser> _userManager;
+        // Доступ к текущему HTTP-контексту(тип IHttpContextAccessor), который используется для получения информации о текущем пользователе.
         private readonly IHttpContextAccessor _httpContextAccessor;
+        // управление пользовательми
+        private readonly UserManager<IdentityUser> _userManager;
 
+        // Конструктор
         public CartRepository(ApplicationDbContext db, 
                               IHttpContextAccessor httpContextAccessor,
                               UserManager<IdentityUser> userManager)
@@ -19,9 +23,10 @@ namespace BrandClothingEcommerce.Repositories
             _userManager = userManager;
         }
 
-        #region Добавление товара (AddItem)
+        #region Добавление товара в корзину (AddItem)
         public async Task<int> AddItem(int productId, int qty)
         {
+            // Получаем идентификатор пользователя 
             string userId = GetUserId();
             using var transaction = _db.Database.BeginTransaction();// Чекай внизу 
             try
@@ -73,10 +78,12 @@ namespace BrandClothingEcommerce.Repositories
         }
         #endregion
 
-        #region Удаление товара (RemoveItem)
+        #region Удаления товара из корзины (RemoveItem)
         public async Task<int> RemoveItem(int productId)
         {
             //using var transaction = _db.Database.BeginTransaction();
+
+            // Получаем идентификатор пользователя 
             string userId = GetUserId();
             try
             {
@@ -84,6 +91,7 @@ namespace BrandClothingEcommerce.Repositories
                 if (string.IsNullOrEmpty(userId)) 
                     throw new Exception("user is not logged-in");
 
+                // Получаем корзину пользоваетеля
                 var cart = await GetCart(userId);
                 // Проверяем наличие данных в бд о корзине пользователя
                 if (cart is null) throw new Exception("invalid cart");
