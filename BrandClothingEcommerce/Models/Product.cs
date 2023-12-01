@@ -21,5 +21,6 @@ namespace BrandClothingEcommerce.Models
         public List<CartDetail> CartDetail { get; set; }
         [NotMapped]
         public string TypeName { get; set; }
+        //public ProductStatus ProductStatus { get; set; }
     }
 }
