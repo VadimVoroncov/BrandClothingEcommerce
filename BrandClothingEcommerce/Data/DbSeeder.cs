@@ -1,35 +1,34 @@
-﻿using BrandClothingEcommerce.Enum;
+﻿using BrandClothingEcommerce.Models.MyIdentity;
 using Microsoft.AspNetCore.Identity;
-using System.Data;
+
 
 namespace BrandClothingEcommerce.Data
 {
-    public class DbSeeder
+    public static class DbSeeder
     {
         public static async Task SeedDefaultData(IServiceProvider service)
         {
-            // менеджер пользователей
-            var userMgr = service.GetService<UserManager<IdentityUser>>();
-            // менеджер ролей
+            // Исходные роли
+            var userMgr = service.GetService<UserManager<AppUser>>();
             var roleMgr = service.GetService<RoleManager<IdentityRole>>();
-
-            // adding role  to user 
             // здесь нужно переёти в program.cs  и изменить 18 строку на добавление ролей
-            await roleMgr.CreateAsync(new IdentityRole(Roles.Admin.ToString()));
-            await roleMgr.CreateAsync(new IdentityRole(Roles.User.ToString()));
+            await roleMgr.CreateAsync(new IdentityRole(Enum.Roles.Admin.ToString()));
+            await roleMgr.CreateAsync(new IdentityRole(Enum.Roles.User.ToString()));
 
-            // create admin user
-            var admin = new IdentityUser
+            // создание администратора
+            var admin = new AppUser
             {
                 UserName = "admin@gmail.com",
                 Email = "admin@gmail.com",
-                EmailConfirmed = true
+                Name = "admin",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true
             };
             var userInDb = await userMgr.FindByEmailAsync(admin.Email);
             if (userInDb is null)
             {
                 await userMgr.CreateAsync(admin, "Admin@123");
-                await userMgr.AddToRoleAsync(admin, Roles.Admin.ToString());
+                await userMgr.AddToRoleAsync(admin, Enum.Roles.Admin.ToString());
             }
         }
     }

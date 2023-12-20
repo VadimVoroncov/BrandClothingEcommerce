@@ -6,23 +6,27 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using BrandClothingEcommerce.Models.MyIdentity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BrandClothingEcommerce.Areas.Identity.Pages.Account.Manage
-{
+{       
     public class IndexModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
+        private readonly IFileRepository _fileRepository;
 
         public IndexModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            UserManager<AppUser> userManager,
+            SignInManager<AppUser> signInManager,
+            IFileRepository fileRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _fileRepository = fileRepository;
         }
 
         /// <summary>
@@ -44,6 +48,7 @@ namespace BrandClothingEcommerce.Areas.Identity.Pages.Account.Manage
         /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
+        public IFileRepository FileRepository { get; }
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -58,9 +63,15 @@ namespace BrandClothingEcommerce.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+            public string Name { get; set; }
+            //TODO добавление свойств в модель InputModel для отображения изображения когда мы заходим в свой профиль
+            public string ProfilePicture { get; set; }
+            public IFormFile ImageFile { get; set; }
+
+
         }
 
-        private async Task LoadAsync(IdentityUser user)
+        private async Task LoadAsync(AppUser user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
@@ -69,7 +80,9 @@ namespace BrandClothingEcommerce.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                Name = user.Name,
+                ProfilePicture = user.ProfilePicture
             };
         }
 
@@ -107,6 +120,25 @@ namespace BrandClothingEcommerce.Areas.Identity.Pages.Account.Manage
                 {
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
+                }
+            }
+
+            if(user.Name != Input.Name)
+            {
+                user.Name = Input.Name;
+                await _userManager.UpdateAsync(user); 
+            }
+
+            //TODO add code to img upload
+            if(Input.ImageFile != null)
+            {
+                var result = _fileRepository.SaveImage(Input.ImageFile);
+                if (result.Item1 == 1)
+                {
+                    var oldImage = user.ProfilePicture;
+                    user.ProfilePicture = result.Item2;
+                    await _userManager.UpdateAsync(user);
+                    _fileRepository.DeleteImage(oldImage);
                 }
             }
 

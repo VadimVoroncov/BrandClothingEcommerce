@@ -1,11 +1,12 @@
 ﻿using BrandClothingEcommerce.Models;
+using BrandClothingEcommerce.Models.MyIdentity;
 using Humanizer.Localisation;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace BrandClothingEcommerce.Data
+namespace BrandClothingEcommerce.Data   
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<AppUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

@@ -1,21 +1,23 @@
 using BrandClothingEcommerce;
-using BrandClothingEcommerce.Data;
+using BrandClothingEcommerce.Models.MyIdentity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services // поменяли
-    .AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddIdentity<AppUser, IdentityRole>()
+    // .AddIdentity<AppUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultUI()
-    .AddDefaultTokenProviders();
+    .AddDefaultUI().AddDefaultTokenProviders();
 
 builder.Services.AddControllersWithViews();
 
@@ -23,6 +25,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IHomeRepository, HomeRepository>();
 builder.Services.AddTransient<ICartRepository, CartRepository>();
 builder.Services.AddTransient<IUserOrderRepository, UserOrderRepository>();
+//builder.Services.AddTransient<IChangingTheStatusOfCards, ChangingTheStatusOfCards>();
+//TODO Добавили сервис по добавлению изобаржения 
+builder.Services.AddScoped<IFileRepository, FileRepository>();
 
 var app = builder.Build();
 

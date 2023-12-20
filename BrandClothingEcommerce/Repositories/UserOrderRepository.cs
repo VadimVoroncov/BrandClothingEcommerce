@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using BrandClothingEcommerce.Models.MyIdentity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BrandClothingEcommerce.Repositories
@@ -11,11 +12,11 @@ namespace BrandClothingEcommerce.Repositories
         // который используется для получения информации о текущем пользователе.
         private readonly IHttpContextAccessor _httpContextAccessor;
         // управление пользовательми
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<AppUser> _userManager;
 
         // Конструктор
         public UserOrderRepository(ApplicationDbContext db, 
-                                   UserManager<IdentityUser> userManager,
+                                   UserManager<AppUser> userManager,
                                    IHttpContextAccessor httpContextAccessor) 
         {
             _db = db;

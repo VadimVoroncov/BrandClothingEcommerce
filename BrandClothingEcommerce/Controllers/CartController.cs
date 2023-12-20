@@ -4,7 +4,8 @@ using System.Net.Quic;
 
 namespace BrandClothingEcommerce.Controllers
 {
-    [Authorize]// Этот атрибут означает что только авторизованный пользователь получает доступ к контроллеру
+
+    [Authorize]// Этот атрибут означает что только авторизованный пользователь получает доступ к контроллеру  
     public class CartController : Controller
     {
         private readonly ICartRepository _cartRepository;

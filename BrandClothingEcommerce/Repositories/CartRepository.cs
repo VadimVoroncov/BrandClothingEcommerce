@@ -1,6 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using BrandClothingEcommerce.Models.MyIdentity;
+using Humanizer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 namespace BrandClothingEcommerce.Repositories
 {
@@ -11,12 +16,13 @@ namespace BrandClothingEcommerce.Repositories
         // Доступ к текущему HTTP-контексту(тип IHttpContextAccessor), который используется для получения информации о текущем пользователе.
         private readonly IHttpContextAccessor _httpContextAccessor;
         // управление пользовательми
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly ILogger<CartRepository> _logger;
 
         // Конструктор
         public CartRepository(ApplicationDbContext db, 
                               IHttpContextAccessor httpContextAccessor,
-                              UserManager<IdentityUser> userManager)
+                              UserManager<AppUser> userManager)
         {
             _db = db;
             _httpContextAccessor = httpContextAccessor;
@@ -70,7 +76,8 @@ namespace BrandClothingEcommerce.Repositories
             }
             catch (Exception ex) 
             {
-                
+                //_logger.LogError(ex.ToString());
+                _logger.LogInformation(ex.ToString());
             }
             var cartItemCount = await GetCartItemCount(userId);
             return cartItemCount;
@@ -116,7 +123,7 @@ namespace BrandClothingEcommerce.Repositories
             }
             catch (Exception ex)
             {
-                
+                _logger.LogError(ex.ToString());
             }
             var cartItemCount = await GetCartItemCount(userId);
             return cartItemCount;
